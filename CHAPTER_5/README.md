@@ -1,90 +1,61 @@
-                     CHAPTER-5 - TEXT CLUSTERING AND TOPIC MODELLING
+                CHAPTER-5 = TEXT CLUSTERING AND TOPIC MODELLING
 
+1. Text Clustering
 
-1. Using Text Generation Models
+Text clustering is an unsupervised learning technique used to group similar documents based on their meaning. Each document in the dataset (such as an abstract or a row in the dataset) is compared with other documents, and documents with similar semantic content are placed into the same cluster. It helps in organizing large amounts of unstructured text and discovering hidden patterns without using labeled data.
 
-Text generation models (LLMs) generate human-like text based on the input prompt. They are used for tasks such as question answering, summarization, translation, content writing, and code generation. In this chapter, the book uses the open-source Phi-3 Mini model because it is lightweight, free, and can run on an 8 GB GPU.
+2. Topic Modeling
 
-2. Loading a Text Generation Model
+Topic modeling extends text clustering by giving meaning to the clusters. Instead of referring to a group as "Cluster 0" or "Cluster 1," topic modeling describes each cluster using important keywords or a meaningful label. In simple words, text clustering groups similar documents, while topic modeling explains what those groups are about.
 
-A text generation model is loaded using the Transformers library with AutoModelForCausalLM, AutoTokenizer, and pipeline. The model generates text, the tokenizer converts text into tokens, and the pipeline simplifies the interaction by handling tokenization, prompt formatting, and text generation automatically.
+3. Embedding Documents
 
-3. Messages and Chat Templates
+The first step in the pipeline is converting every document into an embedding. An embedding is a numerical vector that represents the semantic meaning of a document. Documents with similar meanings have similar embedding vectors, which makes it easier to group them later.
 
-Instead of giving a plain prompt, chat models use a messages format with roles like user and assistant. The Transformers pipeline automatically converts these messages into the chat template (<|user|>, <|assistant|>) expected by the model. This is why we usually don't need to call apply_chat_template() ourselves.
+4. Reducing the Dimensionality of Embeddings (UMAP)
 
-4. Controlling Model Output
+The generated embeddings contain many dimensions (384 values in this chapter). High-dimensional data is difficult to cluster efficiently, so UMAP reduces these vectors to a smaller number of dimensions (for example, 5) while preserving most of the semantic relationships. This makes clustering faster and more accurate.
 
-The generated output can be controlled using parameters like do_sample, temperature, and top_p. These parameters determine whether the model should produce deterministic or creative responses. Adjusting them allows us to balance accuracy and creativity depending on the task.
+5. Clustering with HDBSCAN
 
-5. Temperature
+After reducing the dimensions, HDBSCAN groups similar embedding vectors into clusters. Unlike algorithms such as K-Means, HDBSCAN does not require the number of clusters to be specified beforehand. It also detects outliers, which are documents that do not fit into any cluster, and assigns them the label -1.
 
-Temperature controls the randomness of token selection. A low temperature makes the model choose highly probable tokens, producing consistent and focused responses. A high temperature allows lower-probability tokens to be selected, resulting in more creative and diverse outputs.
+6. Inspecting and Visualizing Clusters
 
-6. Top-p (Nucleus Sampling)
+Once the clusters are created, they can be inspected by printing a few documents from a selected cluster to understand what the documents are about. For visualization, embeddings are reduced to two dimensions using UMAP so that every document can be plotted on a graph. Documents belonging to the same cluster appear close together and are shown using the same color, while outliers are displayed separately.
 
-Top-p controls how many candidate tokens the model can choose from based on cumulative probability. A low top_p restricts the model to a small set of highly probable tokens, while a high top_p allows it to consider a wider range of tokens, increasing vocabulary variety and creativity.
+7. BERTopic
 
-7. Prompt Engineering
+BERTopic is a modular topic modeling framework. It first performs text clustering using embeddings, UMAP, and HDBSCAN. Then it uses class-based TF-IDF (c-TF-IDF) to extract important keywords from each cluster. These keywords become the initial representation of the topics. Since each part of the pipeline is independent, different embedding models, clustering algorithms, and representation techniques can be easily replaced.
 
-Prompt engineering is the process of designing prompts that guide the model toward the desired output. A clear and specific prompt usually produces better responses than a vague one. It is an iterative process where prompts are refined through experimentation to improve quality.
+8. c-TF-IDF (Class-Based TF-IDF)
 
-8. Basic Ingredients of a Prompt
+Instead of calculating important words for each individual document, c-TF-IDF combines all documents in a cluster into one large document. It then calculates the importance of each word within that cluster while reducing the importance of words that appear frequently across many clusters. The highest-weighted words become the representative keywords of the topic.
 
-A good prompt generally contains an instruction, the data related to the task, and sometimes an output indicator that tells the model how the answer should be formatted. These components help the model clearly understand both the task and the expected output.
+9. Exploring Topics
 
-9. Instruction-Based Prompting
+BERTopic provides several functions for exploring the generated topics. get_topic_info() displays all topics, the number of documents in each topic, and the top keywords. get_topic() returns the keywords and their weights for a specific topic. find_topics() searches for topics related to a user-provided word or phrase. The topics_ attribute stores the topic assigned to every document in the dataset.
 
-Instruction-based prompting means directly telling the model what task to perform, such as summarizing, translating, classifying, or generating text. The instruction should be specific, concise, and placed clearly in the prompt to reduce ambiguity and improve output quality.
+10. Visualizing Topics
 
-10. Components of a Complex Prompt
+BERTopic provides interactive visualization tools to better understand the discovered topics. visualize_documents() plots documents in a two-dimensional space. visualize_barchart() displays the most important keywords for each topic. visualize_heatmap() shows how similar different topics are, while visualize_hierarchy() presents hierarchical relationships between related topics.
 
-A complex prompt may include persona, instruction, context, format, audience, tone, and data. Each component provides additional guidance to the model, helping it generate responses that better match the user's expectations. These components can be added or removed depending on the use case.
+11. Representation Models
 
-11. In-Context Learning
+The initial topic keywords generated by c-TF-IDF are based mainly on word frequency and may not always be the best representation of a topic. BERTopic introduces representation models to improve these keywords without changing the clusters themselves. These models only improve how each topic is described.
 
-In-context learning improves model performance by providing examples within the prompt. It includes zero-shot (no examples), one-shot (one example), and few-shot (multiple examples) prompting. By seeing examples, the model learns the expected pattern without changing its internal parameters.
+12. KeyBERTInspired
 
-12. Chain Prompting
+KeyBERTInspired improves topic representations using semantic embeddings. It first uses c-TF-IDF to generate candidate keywords and identify representative documents. It then creates an average embedding of those representative documents and compares it with the embeddings of the candidate keywords using cosine similarity. Keywords with higher similarity are ranked higher, resulting in more meaningful topic representations.
 
-Chain prompting solves complex problems by breaking them into smaller prompts. The output of one prompt becomes the input to the next prompt, creating a sequence of steps. This approach improves accuracy and makes it easier for the model to handle complicated tasks.
+13. Maximal Marginal Relevance (MMR)
 
-13. Reasoning with Generative Models
+MMR improves topic representations by reducing redundancy. It starts with the candidate keywords generated by c-TF-IDF and selects keywords that are both highly relevant to the topic and different from each other. This removes repeated or very similar words and produces a more diverse set of keywords.
 
-Reasoning techniques encourage LLMs to solve problems step by step instead of predicting the final answer immediately. Although LLMs mainly perform pattern matching rather than true reasoning, these techniques help them produce more logical and accurate responses.
+14. Text Generation Representation Models
 
-14. Chain-of-Thought (CoT)
+BERTopic can also use large language models such as Flan-T5 or GPT-3.5 to generate short, human-readable labels for topics. Instead of sending every document to the language model, BERTopic sends only a few representative documents and the topic keywords. The language model reads this information and generates a concise topic label. Since the model is called only once per topic rather than once per document, this method is efficient and scalable.
 
-Chain-of-Thought prompting asks the model to explain its reasoning before giving the final answer. By generating intermediate reasoning steps, the model often performs better on mathematical, logical, and multi-step reasoning tasks. It can be implemented using examples or simply by adding phrases like "Let's think step-by-step."
+15. Overall Pipeline
 
-15. Self-Consistency
-
-Self-consistency improves reliability by asking the model the same question multiple times using sampling. Since each run may produce different reasoning paths, the final answer is selected using majority voting. This reduces randomness and increases the likelihood of obtaining the correct answer.
-
-16. Tree-of-Thought (ToT)
-
-Tree-of-Thought extends Chain-of-Thought by exploring multiple reasoning paths instead of just one. The model evaluates different intermediate solutions, keeps the promising ones, and discards weaker ones before reaching the final answer. This approach is useful for complex reasoning and creative problem-solving but requires more computation.
-
-17. Output Verification
-
-Before using an LLM's output in real-world applications, it should be verified for correctness, structure, ethics, and accuracy. Verification helps ensure that the output follows the required format, avoids hallucinations, and is safe for production use.
-
-18. Providing Examples for Output
-
-Few-shot prompting can also guide the structure of the output. By showing the model an example of the expected format, such as a JSON object, it is more likely to generate responses that follow the same structure. However, the model may still occasionally deviate from the format.
-
-19. Grammar-Constrained Sampling
-
-Grammar-constrained sampling restricts the tokens the model is allowed to generate, ensuring that the output follows predefined rules such as valid JSON or a limited set of labels. Libraries like llama-cpp-python, Guidance, and Guardrails implement these constraints to produce more reliable outputs.
-
-20. GGUF Model Format
-
-GGUF is a model file format used by llama-cpp-python for storing quantized and optimized language models. Unlike the Transformers library, which automatically selects the required files, llama-cpp requires the user to specify the exact GGUF file to load. This format is designed for efficient inference and lower memory usage.
-
-21. Memory Management
-
-When switching from one model to another, it is often necessary to free CPU and GPU memory by deleting the old model and clearing the cache. This prevents memory-related errors such as CUDA Out of Memory and allows the new model to load successfully. If sufficient memory is available, clearing is not required.
-
-22. JSON Output Validation
-
-When a model is instructed to generate JSON, its output should be validated before use. The function json.loads() checks whether the generated text is valid JSON and raises an error if it is not. After validation, json.dumps(..., indent=4) formats the JSON into a clean, readable structure without changing its content.
+The complete BERTopic pipeline starts by converting documents into embeddings, reducing their dimensions using UMAP, clustering them with HDBSCAN, extracting topic keywords using c-TF-IDF, improving those keywords with representation models such as KeyBERTInspired or MMR, and optionally generating meaningful topic labels using large language models. This modular pipeline makes BERTopic a flexible and powerful framework for discovering, understanding, and visualizing topics in large collections of text.

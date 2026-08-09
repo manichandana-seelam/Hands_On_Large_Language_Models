@@ -2,7 +2,7 @@
 
 1. Tokens
 
-Tokens are the smallest units of text that an LLM processes. A token can be a word, part of a word, punctuation mark, or even a single character. Before understanding text, every sentence is first converted into tokens.
+Tokens are the smallest units of text that an LLM processes. A token can be a word, part of a word, punctuation mark,or even a single character. Before understanding text, every sentence is first converted into tokens.
 
 2. Tokenization
 

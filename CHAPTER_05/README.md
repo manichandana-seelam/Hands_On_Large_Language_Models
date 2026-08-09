@@ -58,4 +58,4 @@ BERTopic can also use large language models such as Flan-T5 or GPT-3.5 to genera
 
 15. Overall Pipeline
 
-The complete BERTopic pipeline starts by converting documents into embeddings, reducing their dimensions using UMAP, clustering them with HDBSCAN, extracting topic keywords using c-TF-IDF, improving those keywords with representation models such as KeyBERTInspired or MMR, and optionally generating meaningful topic labels using large language models. This modular pipeline makes BERTopic a flexible and powerful framework for discovering, understanding, and visualizing topics in large collections of text.
+The complete BERTopic pipeline starts by converting documents into embeddings, reducing their dimensions using UMAP, clustering them with HDBSCAN, extracting topic keywords using c-TF-IDF, improving those keywords with representation models such as KeyBERTInspired or MMR, and optionally generating meaningful topic labels using large language models. This modular pipeline makes BERTopic a flexible and powerful framework for discovering, understanding, and visualizing topics in large collections of text .

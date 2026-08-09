@@ -1,4 +1,4 @@
-                           CHAPTER 2 - LOOKING INSIDE THE LARGE LANGUAGE MODELS
+                           CHAPTER 2 - LOOKING INSIDE THE LARGE LANGUAGE MODELS .
 
 1. Overview of a Transformer LLM
 

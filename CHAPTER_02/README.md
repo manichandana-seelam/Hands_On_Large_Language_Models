@@ -1,4 +1,4 @@
-                           CHAPTER 2 - TOKENS AND EMBEDDINGS
+                           CHAPTER 2 - TOKENS AND EMBEDDINGS .
 
 1. Tokens
 

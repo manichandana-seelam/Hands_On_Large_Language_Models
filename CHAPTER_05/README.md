@@ -1,4 +1,4 @@
-                CHAPTER-5 = TEXT CLUSTERING AND TOPIC MODELLING
+                CHAPTER-5 = TEXT CLUSTERING AND TOPIC MODELLING .
 
 1. Text Clustering
 

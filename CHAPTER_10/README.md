@@ -1,4 +1,4 @@
-                    CHAPTER-10 CREATING TEXT EMBEDDING MODELS
+                    CHAPTER-10 CREATING TEXT EMBEDDING MODELS .
 
                     
 1. Embedding Models
